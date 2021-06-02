@@ -389,6 +389,25 @@ if(EMSCRIPTEN)
   set_property(TARGET binaryen_wasm PROPERTY CXX_STANDARD_REQUIRED ON)
   install(TARGETS binaryen_wasm DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+  # binaryen.js WebAssembly ESM variant
+  add_executable(binaryen_wasm_esm
+                 ${binaryen_emscripten_SOURCES})
+  target_link_libraries(binaryen_wasm_esm wasm asmjs emscripten-optimizer passes ir cfg support wasm)
+  target_link_libraries(binaryen_wasm_esm "-s NO_FILESYSTEM=0")
+  target_link_libraries(binaryen_wasm_esm "-s NODERAWFS=0")
+  target_link_libraries(binaryen_wasm_esm "-s ENVIRONMENT=web")
+  target_link_libraries(binaryen_wasm_esm "-s EXPORT_NAME=binaryen")
+  target_link_libraries(binaryen_wasm_esm "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/src/js/binaryen.js-post.js")
+  target_link_libraries(binaryen_wasm_esm "--extern-pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src/js/binaryen.js-extern-pre.esm.js")
+  target_link_libraries(binaryen_wasm_esm "--extern-post-js ${CMAKE_CURRENT_SOURCE_DIR}/src/js/binaryen.js-extern-post.esm.js")
+  target_link_libraries(binaryen_wasm_esm optimized "--closure 1")
+  target_link_libraries(binaryen_wasm_esm optimized "--closure-args \"--language_in=ECMASCRIPT_NEXT --language_out=ECMASCRIPT_NEXT\"")
+  target_link_libraries(binaryen_wasm_esm optimized "-flto")
+  target_link_libraries(binaryen_wasm_esm debug "--profiling")
+  set_property(TARGET binaryen_wasm_esm PROPERTY CXX_STANDARD ${CXX_STANDARD})
+  set_property(TARGET binaryen_wasm_esm PROPERTY CXX_STANDARD_REQUIRED ON)
+  install(TARGETS binaryen_wasm_esm DESTINATION ${CMAKE_INSTALL_BINDIR})
+
   # binaryen.js JavaScript variant
   add_executable(binaryen_js
                  ${binaryen_emscripten_SOURCES})
